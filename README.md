@@ -44,7 +44,9 @@ MCP/
     │   └── server/           # Ferramentas MCP para PostgreSQL
     └── 05/
         ├── README.md
-        ├── chat/             # Interface Streamlit, agentes e imagem
+        ├── chat/             # Interface Streamlit e imagem
+        ├── client/           # Conexão MCP para os agentes
+        ├── llm/              # Agentes e histórico da conversa
         └── server/           # Ferramentas de atendimento da concessionária
 ```
 

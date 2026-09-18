@@ -1,13 +1,18 @@
 from mcp.server.fastmcp import FastMCP
 import psycopg2, json
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
-mcp = FastMCP("SQL", dependencies=["psycopg2"])
+load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 
-SERVER = "143.244.215.137"
-PORT = "5432"
-DATABASE = "novadrive"
-USERNAME = "etlreadonly"
-PASSWORD = "novadrive376A@"
+mcp = FastMCP("SQL", dependencies=["psycopg2", "python-dotenv"])
+
+SERVER = os.environ["DB_HOST"]
+PORT = os.environ["DB_PORT"]
+DATABASE = os.environ["DB_NAME"]
+USERNAME = os.environ["DB_USER"]
+PASSWORD = os.environ["DB_PASSWORD"]
 
 CONN_STR = {
     "host": SERVER,

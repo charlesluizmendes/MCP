@@ -71,13 +71,18 @@ Instale as dependências:
 python3 -m pip install -r requirements.txt
 ```
 
-Para os projetos `03`, `04` e `05`, configure a chave da OpenAI em um arquivo `.env` na raiz:
+Para os projetos `03`, `04` e `05`, configure a chave da OpenAI e a conexão PostgreSQL em um arquivo `.env` na raiz:
 
 ```dotenv
 OPENAI_API_KEY=sua_chave_aqui
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=seu_banco
+DB_USER=seu_usuario
+DB_PASSWORD=sua_senha
 ```
 
-Esses projetos também precisam de acesso ao PostgreSQL utilizado pelos exemplos. A conexão está definida em `server/mcpServerSql.py` dentro de cada pasta. O repositório não inclui scripts para criar ou popular o banco. No projeto `05`, as consultas dependem das tabelas de veículos, concessionárias, cidades, estados, vendedores, clientes e vendas.
+Esses projetos também precisam de acesso ao PostgreSQL utilizado pelos exemplos. Os três servidores carregam o `.env` da raiz, independentemente do diretório de execução. Variáveis já definidas no ambiente têm prioridade sobre o arquivo. O repositório não inclui scripts para criar ou popular o banco. No projeto `05`, as consultas dependem das tabelas de veículos, concessionárias, cidades, estados, vendedores, clientes e vendas.
 
 ## Execução
 

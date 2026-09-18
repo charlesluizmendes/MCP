@@ -14,7 +14,7 @@ A cada mensagem, as tools são convertidas pelo SDK e somente as permitidas são
 
 ## Execução
 
-Na raiz do repositório, com o ambiente virtual ativo e a chave `OPENAI_API_KEY` configurada no `.env`, execute o aplicativo. O servidor MCP é iniciado automaticamente via stdio durante o atendimento; as consultas dependem do acesso ao PostgreSQL configurado no servidor.
+Na raiz do repositório, com o ambiente virtual ativo e a chave `OPENAI_API_KEY` configurada no `.env`, execute o aplicativo. O servidor MCP é iniciado automaticamente via stdio durante o atendimento; as consultas dependem do acesso ao PostgreSQL configurado nas variáveis `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASSWORD` do `.env`.
 
 ```bash
 python3 -m streamlit run src/05/chat/chatStreamlit.py

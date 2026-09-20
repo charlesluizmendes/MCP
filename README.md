@@ -1,6 +1,6 @@
 # Exemplos de MCP com Python
 
-Repositório de exemplos de uso do **Model Context Protocol (MCP)** para conectar aplicações e agentes de inteligência artificial a ferramentas, recursos e prompts. Os cinco projetos apresentam uma evolução: um servidor básico, um cliente Python, um chat no terminal, uma interface web e um atendimento com agentes especializados.
+Repositório de exemplos de uso do **Model Context Protocol (MCP)** para conectar aplicações e agentes de inteligência artificial a ferramentas, recursos e prompts. Os seis projetos apresentam uma evolução: um servidor básico, um cliente Python, um chat no terminal, uma interface web, um atendimento com agentes especializados e um chat com MCP HTTP autenticado.
 
 Os exemplos usam Python, FastMCP, PostgreSQL, Streamlit e integrações com a OpenAI, conforme a proposta de cada pasta.
 
@@ -13,8 +13,9 @@ Os exemplos usam Python, FastMCP, PostgreSQL, Streamlit e integrações com a Op
 | [03](src/03/README.md) | Chat com banco de dados no terminal | Agente do SDK OpenAI Agents que usa um servidor MCP para consultar o esquema e os dados de um PostgreSQL. |
 | [04](src/04/README.md) | Chat com banco de dados no navegador | Interface Streamlit com cliente MCP próprio e integração com a API de chat da OpenAI, exibindo chamadas de ferramentas e resultados. |
 | [05](src/05/README.md) | Atendimento com múltiplos agentes | Interface Streamlit com agentes de recepção, vendas e manutenção da NovaDrive Motors, consultas ao PostgreSQL e agendamentos simulados. |
+| [06](src/06/README.md) | Chat com MCP HTTP autenticado | Streamable HTTP com OAuth Client Credentials, Keycloak local, validação JWT e as ferramentas PostgreSQL do projeto 05. |
 
-As pastas contêm exemplos independentes. A ordem de `01` a `05` ajuda a acompanhar a evolução das integrações.
+As pastas contêm exemplos independentes. A ordem de `01` a `06` ajuda a acompanhar a evolução das integrações.
 
 ## Estrutura
 
@@ -42,17 +43,22 @@ MCP/
     │   ├── client/           # Cliente MCP próprio
     │   ├── llm/              # Integração com o modelo de linguagem
     │   └── server/           # Ferramentas MCP para PostgreSQL
-    └── 05/
+    ├── 05/
+    │   ├── README.md
+    │   ├── chat/             # Interface Streamlit e imagem
+    │   ├── client/           # Conexão MCP para os agentes
+    │   ├── llm/              # Agentes e histórico da conversa
+    │   └── server/           # Ferramentas de atendimento da concessionária
+    └── 06/
         ├── README.md
-        ├── chat/             # Interface Streamlit e imagem
-        ├── client/           # Conexão MCP para os agentes
-        ├── llm/              # Agentes e histórico da conversa
-        └── server/           # Ferramentas de atendimento da concessionária
+        ├── chat/            # Chat, cliente MCP, LLM e configuração do chat
+        ├── server/          # FastMCP e validação JWT
+        ├── keycloak/        # Compose, realm e cliente OAuth
 ```
 
 ## Preparação do ambiente
 
-Execute os comandos a partir da raiz do repositório. Crie um ambiente virtual e ative-o:
+Todos os projetos usam o `requirements.txt` da raiz. O projeto 06 usa as variáveis de ambiente descritas em seu [README](src/06/README.md).
 
 ```bash
 python3 -m venv venv
@@ -140,6 +146,28 @@ Nos projetos `04` e `05`, abra o endereço exibido pelo Streamlit no terminal. U
 
 Os projetos `03`, `04` e `05` iniciam seus servidores MCP automaticamente por entrada e saída padrão (stdio).
 
+### 06 — Chat com MCP HTTP autenticado
+
+Após a [configuração do projeto 06](src/06/README.md), inicie o provedor OAuth local:
+
+```bash
+docker compose --env-file src/06/keycloak/.env -f src/06/keycloak/compose.yaml up -d
+```
+
+Com a `venv` da raiz ativa nos dois terminais, inicie o servidor em um deles:
+
+```bash
+python src/06/server/mcpServer.py
+```
+
+No outro, inicie o chat:
+
+```bash
+python -m streamlit run src/06/chat/chatStreamlit.py
+```
+
+O cliente descobre o Keycloak pelo MCP, obtém um token via OAuth Client Credentials e acessa `http://127.0.0.1:8006/mcp`. O servidor valida assinatura, expiração, emissor, destinatário e o escopo `novadrive:read` antes de permitir o acesso às ferramentas de atendimento e consultas PostgreSQL do projeto 05. O projeto 05 permanece em stdio.
+
 ## Como as integrações funcionam
 
 Nos projetos `01` e `02`, o servidor expõe três elementos do MCP: uma **ferramenta** que executa uma soma, um **recurso** que fornece as despesas de um arquivo e um **prompt** que monta uma instrução para formatar CPF.
@@ -147,3 +175,5 @@ Nos projetos `01` e `02`, o servidor expõe três elementos do MCP: uma **ferram
 Nos projetos `03` e `04`, o modelo recebe a pergunta do usuário e pode chamar ferramentas MCP para descobrir tabelas e colunas, verificar a conexão e executar SQL. O resultado volta ao modelo para compor a resposta. O projeto `03` usa o SDK OpenAI Agents; o `04` implementa o fluxo de chamadas de ferramentas com utilitários próprios.
 
 No projeto `05`, o agente de recepção encaminha a conversa para vendas ou manutenção. Os agentes especializados consultam ferramentas de negócio, como listar veículos e identificar clientes. As ferramentas de agendamento retornam mensagens de sucesso simuladas e não gravam visitas no banco.
+
+No projeto `06`, o chat e o servidor MCP são processos separados e se comunicam por Streamable HTTP. O cliente do chat obtém um token OAuth Client Credentials no Keycloak e o envia ao MCP. O servidor valida o JWT, o escopo e a audience antes de executar as ferramentas de atendimento do projeto 05, usando o PostgreSQL configurado no `.env` da raiz.
